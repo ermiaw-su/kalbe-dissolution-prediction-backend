@@ -8,7 +8,7 @@ const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 router.post("/login", userController.login);
 
 // ADMIN ONLY
-router.post("/register", userController.register);
+router.post("/register", verifyToken, isAdmin, userController.register);
 
 router.get("/", verifyToken, isAdmin, userController.getUser);
 
