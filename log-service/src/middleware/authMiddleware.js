@@ -1,0 +1,32 @@
+const jwt = require('jsonwebtoken')
+
+exports.verifyToken = (req, res, next) => {
+    const authHeader = req.headers.authorization
+
+    if (!authHeader) {
+        return res.status(401).json({
+            message: "Token is required"
+        })
+    }
+
+    const token = authHeader.split(' ')[1]
+
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET)
+        req.user = decoded
+        next()
+    } catch (error) {
+        return res.status(401).json({
+            message: "Invalid token"
+        })
+    }
+}
+
+exports.isAdmin= (req, res, next) => {
+    if (req.user.role !== 'administrator') {
+        return res.status(403).json({
+            message: "You are not an administrator"
+        })
+    }
+    next()
+}

@@ -14,3 +14,10 @@ services:
       - "3002:3002"
     env_file:
       - ./dataset-service/.env
+
+  log-service:
+    build: ./log-service
+    ports:
+      - "3004:3004"
+    env_file:
+      - ./log-service/.env
