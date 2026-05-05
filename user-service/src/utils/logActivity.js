@@ -3,7 +3,7 @@ const axios = require('axios');
 const logActivity = async (action, description, user) => {
 
     try {
-        await axios.post(`${process.env.ACTIVITY_SERVICE_URL}/logs`, {
+        await axios.post(`${process.env.ACTIVITY_SERVICE_URL}/api/logs`, {
             action,
             description,
             userId: user?.id || null,
