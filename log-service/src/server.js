@@ -8,5 +8,5 @@ connectDB();
 const PORT = process.env.PORT;
 
 app.listen(PORT, () => {
-    console.log(`Dataset Service running on port ${PORT}`);
+    console.log(`Log Service running on port ${PORT}`);
 });
