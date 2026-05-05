@@ -4,6 +4,7 @@ const {verifyToken, isAdmin} = require("../middleware/authMiddleware")
 
 const logController = require("../controllers/logController");
 
+router.post("/", logController.createLog);
 router.get("/", verifyToken, isAdmin, logController.getActivityLogs)
 
 module.exports = router

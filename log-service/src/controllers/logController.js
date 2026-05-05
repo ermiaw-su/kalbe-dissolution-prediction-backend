@@ -1,5 +1,26 @@
 const ActivityLog = require("../models/ActivityLog");
 
+exports.createLog = async (req, res) => {
+    try {
+        const { action, description, userId, doneBy, role } = req.body;
+
+        const log = await ActivityLog.create({
+            action,
+            description,
+            userId,
+            doneBy,
+            role
+        });
+
+        res.status(201).json(log);
+    } catch (error) {
+        res.status(500).json({
+            message: "Error creating log",
+            error: error.message
+        });
+    }
+};
+
 exports.getActivityLogs = async (req, res) => {
     try {
         //Take input
