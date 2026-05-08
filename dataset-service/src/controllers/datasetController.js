@@ -16,6 +16,17 @@ exports.uploadDataset = async (req, res) => {
             });
         }
 
+        // Only .sam
+        if (!file.originalname.toLowerCase().endsWith(".sam")) {
+            if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+
+            return res.status(400).json({
+                message: "Invalid file type, only SAM files are allowed"
+            })
+        }
+
         // validate file content
         let data;
         try {
@@ -72,7 +83,7 @@ exports.uploadDataset = async (req, res) => {
 // GET ALL DATASETS
 exports.getDatasets = async (req, res) => {
     try{
-        const datasets = await Dataset.find().populate("uploadedBy", "username").sort({ uploadTime: -1 })
+        const datasets = await Dataset.find({statusDataset: "Active"}).populate("uploadedBy", "username").sort({ uploadTime: -1 })
 
         res.status(200).json({
             count: datasets.length,
@@ -130,6 +141,36 @@ exports.updateDataset = async (req, res) => {
             message: "Error updating dataset",
             error: error.message
         })
+    }
+}
+
+// ARCHIVE DATASET
+exports.archiveDataset = async (req, res) => {
+    try {
+        const dataset = await Dataset.findById(req.params.id);
+
+        if (!dataset) {
+            return res.status(404).json({
+                message: "Dataset not found",
+            });
+        }
+
+        await dataset.updateOne({ statusDataset: "Archived" });
+
+        await logActivity(
+            "ARCHIVE_DATASET",
+            `Archived dataset ${dataset.originalName}`,
+            req.user
+        );
+
+        res.status(200).json({
+            message: "Dataset archived successfully",
+        });
+    } catch (error) {
+        res.status(500).json({
+            message: "Error archiving dataset",
+            error: error.message,
+        });
     }
 }
 

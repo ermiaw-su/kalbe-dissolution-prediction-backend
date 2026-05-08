@@ -9,16 +9,16 @@ exports.validateFile = (filePath) => {
     // CSV
     if (ext === ".csv") {
         return new Promise((resolve, reject) => {
-            const result = [];
+            const results = [];
 
             fs.createReadStream(filePath)
                 .pipe(csv())
-                .on("data", (data) => resourceLimits.push(data))
+                .on("data", (data) => results.push(data))
                 .on("end", () => {
-                    if (result.length > 0) {
-                        resolve(result);
+                    if (results.length > 0) {
+                        resolve(results);
                     } 
-                    resolve(resuslts)
+                    resolve(results)
                 })
                 .on("error", (error) => {
                     reject(error);
