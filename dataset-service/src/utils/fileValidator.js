@@ -25,7 +25,7 @@ exports.validateFile = (filePath) => {
                 });
         })
     }
-    if (ext === ".xlsx") {
+    if (ext === ".xlsx" || ext === ".xls") {
         const workbook = xlsx.readFile(filePath)
         const sheetName = workbook.SheetNames[0]
 

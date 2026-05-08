@@ -16,17 +16,6 @@ exports.uploadDataset = async (req, res) => {
             });
         }
 
-        // Only .sam
-        if (!file.originalname.toLowerCase().endsWith(".sam")) {
-            if (fs.existsSync(file.path)) {
-                fs.unlinkSync(file.path);
-            }
-
-            return res.status(400).json({
-                message: "Invalid file type, only SAM files are allowed"
-            })
-        }
-
         // validate file content
         let data;
         try {
@@ -82,20 +71,21 @@ exports.uploadDataset = async (req, res) => {
 
 // GET ALL DATASETS
 exports.getDatasets = async (req, res) => {
-    try{
-        const datasets = await Dataset.find({statusDataset: "Active"}).populate("uploadedBy", "username").sort({ uploadTime: -1 })
+    try {
+        const datasets = await Dataset.find().sort({ uploadTime: -1 });
 
-        res.status(200).json({
+        res.json({
             count: datasets.length,
             datasets
-        })
+        });
+
     } catch (error) {
         res.status(500).json({
-            message: "Error getting datasets",
+            message: "Error fetching datasets",
             error: error.message
-        })
+        });
     }
-}
+};
 
 // GET DATASET BY ID
 exports.getDatasetById = async (req, res) => {
