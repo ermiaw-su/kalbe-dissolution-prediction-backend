@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const validator = require("validator");
 const logActivity = require("../utils/logActivity");
 const { v4: uuidv4 } = require("uuid");
+const mongoose = require("mongoose");
 
 // REGISTER USER
 exports.register = async (req, res) => {
@@ -216,17 +217,31 @@ exports.deleteUser = async (req, res) => {
 exports.deactivateUser = async (req, res) => {
     try {
         const {id} = req.params
-        const {role} = req.body
 
+        // Check if ID is valid
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "ID is not valid"
+            })
+        }
+
+        // Find and update user
         const user = await User.findByIdAndUpdate(
             id,
             {
-                role,
+                role: "nonActive",
                 updatedBy: req.user?.username,
                 updatedAt: Date.now(),
             },
             {new: true}
         )
+
+        // Check the user
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
 
         await logActivity(
             "DEACTIVATE_USER",
@@ -237,7 +252,10 @@ exports.deactivateUser = async (req, res) => {
         res.json(user)
     } catch (error) {
         console.log(error)
-        res.status(500).json(error)
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        })
     }
 }
 
@@ -245,17 +263,28 @@ exports.deactivateUser = async (req, res) => {
 exports.reactivateUser = async (req, res) => {
     try {
         const {id} = req.params
-        const {role} = req.body
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({
+                message: "ID is not valid"
+            })
+        }
 
         const user = await User.findByIdAndUpdate(
             id,
             {
-                role,
+                role: "operator",
                 updatedBy: req.user?.username,
                 updatedAt: Date.now(),
             },
             {new: true}
         )
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            })
+        }
 
         await logActivity(
             "REACTIVATE_USER",
@@ -266,6 +295,9 @@ exports.reactivateUser = async (req, res) => {
         res.json(user)
     } catch (error) {
         console.log(error)
-        res.status(500).json(error)
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        })
     }
 }
