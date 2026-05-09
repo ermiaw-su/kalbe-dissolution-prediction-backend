@@ -17,7 +17,7 @@ exports.uploadDataset = async (req, res) => {
         }
 
         // Only .sam
-        if (!file.originalname.toLowerCase().endsWith(".sam")) {
+        if (!file.originalname.toLowerCase().endsWith(".csv")) {
             if (fs.existsSync(file.path)) {
                 fs.unlinkSync(file.path);
             }

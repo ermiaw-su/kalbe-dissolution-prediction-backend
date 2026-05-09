@@ -80,6 +80,8 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
     try {
         const { username, password } = req.body;
+        // const username = req.body?.username;
+        // const password = req.body?.password;
 
         if (!username || !password) {
             return res.status(400).json({ 
@@ -136,9 +138,11 @@ exports.login = async (req, res) => {
             token
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ 
-            message: "Internal server error" 
+        console.log("LOGIN ERROR:", error);
+
+        res.status(500).json({
+            message: "Internal server error",
+            error: error.message
         });
     }
 }
