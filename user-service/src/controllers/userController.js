@@ -147,11 +147,72 @@ exports.login = async (req, res) => {
     }
 }
 
-// GET ALL USERS
-exports.getUser = async (req, res) => {
+// GET ALL ACTIVE USERS
+exports.getActiveUser = async (req, res) => {
     try{
-        const users = await User.find().select("-password");
-        res.json(users);
+        // Take from frontend
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const query = {role: {
+            $in: ["administrator", "operator"]
+        }};
+
+        // Pagination
+        const skip = (page - 1) * limit;
+
+        // Take total query
+        const total = await User.countDocuments(query);
+
+        const users = await User
+            .find(query)
+            .select("-password")
+            .sort({createdAt: 1})
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            page,
+            totalPage: Math.ceil(total / limit),
+            totalData: total,
+            users
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ 
+            message: "Internal server error" 
+        });
+    }
+}
+
+// GET ALL NON-ACTIVE USERS
+exports.getInactiveUser = async (req, res) => {
+    try{
+        // Take from frontend
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 5;
+
+        const query = {role: "nonActive"};
+
+        // Pagination
+        const skip = (page - 1) * limit;
+
+        // Take total query
+        const total = await User.countDocuments(query);
+
+        const users = await User
+            .find(query)
+            .select("-password")
+            .sort({createdAt: 1})
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            page,
+            totalPage: Math.ceil(total / limit),
+            totalData: total,
+            users
+        })
     } catch (error) {
         console.log(error);
         res.status(500).json({ 
