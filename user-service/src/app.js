@@ -7,7 +7,6 @@ const specs = require('./docs/swagger');
 const userRoutes = require('./routes/userRoutes');
 
 const app = express();
-
 app.use(cors());
 app.use(express.json());
 
