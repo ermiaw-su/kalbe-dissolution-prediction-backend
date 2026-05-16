@@ -8,6 +8,8 @@ const { validateFile } = require("../utils/fileValidator")
 // UPLOAD DATASET 
 exports.uploadDataset = async (req, res) => {
     try {
+        const allowedFile = [".xls", ".xlsx"];
+
         const file = req.file;
 
         if (!file) {
@@ -16,14 +18,16 @@ exports.uploadDataset = async (req, res) => {
             });
         }
 
-        // Only .sam
-        if (!file.originalname.toLowerCase().endsWith(".csv")) {
+        const ext = path.extname(file.originalname).toLowerCase();
+
+        // Only .xls and .xlsx files are allowed
+        if (!allowedFile.includes(ext)) {
             if (fs.existsSync(file.path)) {
                 fs.unlinkSync(file.path);
             }
 
             return res.status(400).json({
-                message: "Invalid file type, only SAM files are allowed"
+                message: "Invalid file type, only XLS and XLSX files are allowed"
             })
         }
 
@@ -57,7 +61,8 @@ exports.uploadDataset = async (req, res) => {
             filePath: file.path,
             fileSize: file.size,
             rowCount: data.length,
-            uploadedBy: req.user.id
+            uploadedBy: req.user.id,
+            uploadedByUsername: req.user.username
         });
 
         await logActivity(
@@ -83,10 +88,32 @@ exports.uploadDataset = async (req, res) => {
 // GET ALL DATASETS
 exports.getDatasets = async (req, res) => {
     try{
-        const datasets = await Dataset.find({statusDataset: "Active"}).populate("uploadedBy", "username").sort({ uploadTime: -1 })
+        // Take from frontend
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        
+        // Sort
+        const sort = req.query.sort === "asc" ? 1 : -1;
+
+        // Only active datasets
+        const query = {statusDataset: "Active"};
+
+        // Pagination
+        const skip = (page - 1) * limit;
+
+        // Take total query
+        const total = await Dataset.countDocuments(query);
+
+        const datasets = await Dataset
+            .find(query)
+            .sort({uploadTime: sort})
+            .skip(skip)
+            .limit(limit);
 
         res.status(200).json({
-            count: datasets.length,
+            page,
+            totalPage: Math.ceil(total / limit),
+            totalData: total,
             datasets
         })
     } catch (error) {

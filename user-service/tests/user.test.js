@@ -8,6 +8,7 @@ const request = require("supertest");
 const app = require("../src/app");
 const User = require("../src/models/User");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 jest.mock("../src/utils/logActivity", () => jest.fn());
 
@@ -122,5 +123,44 @@ describe("USER TEST", () => {
         const updatedUser = await User.findById(user.id);
 
         expect(updatedUser.role).toBe("operator");
+    });
+
+    it("should change the password", async () => {
+        // create user
+        const user = await User.create({
+            userId: "U008",
+            username: "passwordUser",
+            email: "password@test.com",
+            password: "123456",
+            role: "operator",
+            createdBy: "system"
+        });
+
+        // Sign JWT
+        const token = jwt.sign(
+            {
+                id: user._id,
+                role: user.role,
+                username: user.username
+            },
+            process.env.JWT_SECRET
+        );
+
+        // Change password
+        const res = await request(app)
+            .put(`/api/users/change-password`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                password: "newPassword"
+            });
+
+        expect(res.statusCode).toBe(200);
+
+        const updatedUser = await User.findById(user._id);
+
+        // Check password
+        const isMatch = await bcrypt.compare("newPassword", updatedUser.password);
+
+        expect(isMatch).toBe(true);
     });
 });

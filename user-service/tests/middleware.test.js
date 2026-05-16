@@ -10,7 +10,7 @@ describe("MIDDLEWARE TEST", () => {
     it("should block request without token", async () => {
 
         const res = await request(app)
-            .get("/api/logs");
+            .get("/api/users");
 
         expect(res.statusCode).toBe(401);
 
@@ -26,7 +26,7 @@ describe("MIDDLEWARE TEST", () => {
         );
 
         const res = await request(app)
-            .get("/api/logs")
+            .get("/api/users")
             .set("Authorization", `Bearer ${token}`);
 
         expect(res.statusCode).toBe(403);
@@ -43,7 +43,7 @@ describe("MIDDLEWARE TEST", () => {
         );
 
         const res = await request(app)
-            .get("/api/logs")
+            .get("/api/users")
             .set("Authorization", `Bearer ${token}`);
 
         expect(res.statusCode).not.toBe(401);

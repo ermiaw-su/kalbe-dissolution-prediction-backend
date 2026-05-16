@@ -33,7 +33,7 @@ describe("DATASET TEST", () => {
             .set("Authorization", `Bearer ${token}`)
             .attach(
                 "dataset",
-                path.join(__dirname, "sample.csv")
+                path.join(__dirname, "sample.xls")
             );
 
         expect(res.statusCode).toBe(201);
@@ -50,7 +50,8 @@ describe("DATASET TEST", () => {
             filePath: "/uploads/test.csv",
             fileSize: 100,
             rowCount: 2,
-            uploadedBy: "user123"
+            uploadedBy: "user123",
+            uploadedByUsername: "user123"
         });
 
         const res = await request(app)
@@ -71,7 +72,8 @@ describe("DATASET TEST", () => {
             filePath: "/uploads/test.csv",
             fileSize: 100,
             rowCount: 2,
-            uploadedBy: "user123"
+            uploadedBy: "user123",
+            uploadedByUsername: "user123"
         });
 
         const res = await request(app)
@@ -92,7 +94,8 @@ describe("DATASET TEST", () => {
             filePath: "/uploads/before.csv",
             fileSize: 100,
             rowCount: 2,
-            uploadedBy: "user123"
+            uploadedBy: "user123",
+            uploadedByUsername: "user123"
         });
 
         const res = await request(app)
@@ -114,7 +117,8 @@ describe("DATASET TEST", () => {
             filePath: "/uploads/archive.csv",
             fileSize: 100,
             rowCount: 2,
-            uploadedBy: "user123"
+            uploadedBy: "user123",
+            uploadedByUsername: "user123"
         });
 
         const res = await request(app)
