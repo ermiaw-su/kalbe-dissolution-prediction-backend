@@ -23,10 +23,19 @@ const datasetSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    uploadedByUsername: {
+        type: String,
+        required: true
+    },
     uploadTime: {
         type: Date,
         default: Date.now
-    } 
+    } ,
+    statusDataset: {
+        type: String,
+        enum: ["Active", "Archived"],
+        default: "Active"
+    }
 }, {
     timestamps: true
 });

@@ -8,12 +8,27 @@ const { validateFile } = require("../utils/fileValidator")
 // UPLOAD DATASET 
 exports.uploadDataset = async (req, res) => {
     try {
+        const allowedFile = [".xls", ".xlsx"];
+
         const file = req.file;
 
         if (!file) {
             return res.status(400).json({
                 message: "No file uploaded"
             });
+        }
+
+        const ext = path.extname(file.originalname).toLowerCase();
+
+        // Only .xls and .xlsx files are allowed
+        if (!allowedFile.includes(ext)) {
+            if (fs.existsSync(file.path)) {
+                fs.unlinkSync(file.path);
+            }
+
+            return res.status(400).json({
+                message: "Invalid file type, only XLS and XLSX files are allowed"
+            })
         }
 
         // validate file content
@@ -46,7 +61,8 @@ exports.uploadDataset = async (req, res) => {
             filePath: file.path,
             fileSize: file.size,
             rowCount: data.length,
-            uploadedBy: req.user.id
+            uploadedBy: req.user.id,
+            uploadedByUsername: req.user.username
         });
 
         await logActivity(
@@ -71,21 +87,42 @@ exports.uploadDataset = async (req, res) => {
 
 // GET ALL DATASETS
 exports.getDatasets = async (req, res) => {
-    try {
-        const datasets = await Dataset.find().sort({ uploadTime: -1 });
+    try{
+        // Take from frontend
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        
+        // Sort
+        const sort = req.query.sort === "asc" ? 1 : -1;
 
-        res.json({
-            count: datasets.length,
+        // Only active datasets
+        const query = {statusDataset: "Active"};
+
+        // Pagination
+        const skip = (page - 1) * limit;
+
+        // Take total query
+        const total = await Dataset.countDocuments(query);
+
+        const datasets = await Dataset
+            .find(query)
+            .sort({uploadTime: sort})
+            .skip(skip)
+            .limit(limit);
+
+        res.status(200).json({
+            page,
+            totalPage: Math.ceil(total / limit),
+            totalData: total,
             datasets
-        });
-
+        })
     } catch (error) {
         res.status(500).json({
-            message: "Error fetching datasets",
+            message: "Error getting datasets",
             error: error.message
-        });
+        })
     }
-};
+}
 
 // GET DATASET BY ID
 exports.getDatasetById = async (req, res) => {

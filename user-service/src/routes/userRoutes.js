@@ -7,17 +7,19 @@ const { verifyToken, isAdmin } = require("../middleware/authMiddleware");
 // PUBLIC
 router.post("/login", userController.login);
 
+router.put("/change-password", verifyToken, userController.changePassword);
+
 // ADMIN ONLY
 router.post("/register", userController.register);
 
 router.get("/", verifyToken, isAdmin, userController.getUser);
-
-router.put("/:id", verifyToken, isAdmin, userController.updateUser);
 
 router.delete("/:id", verifyToken, isAdmin, userController.deleteUser);
 
 router.put("/deactivate/:id", verifyToken, isAdmin, userController.deactivateUser);
 
 router.put("/reactivate/:id", verifyToken, isAdmin, userController.reactivateUser);
+
+router.put("/:id", verifyToken, isAdmin, userController.updateUser);
 
 module.exports = router;
