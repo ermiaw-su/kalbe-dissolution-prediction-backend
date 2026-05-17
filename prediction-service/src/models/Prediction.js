@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const predictionSchema = new mongoose.Schema({
+
     datasetId: {
         type: String,
         required: true
@@ -16,23 +17,33 @@ const predictionSchema = new mongoose.Schema({
         required: true
     },
 
+    generatedByName: {
+        type: String,
+        required: true
+    },
+
     status: {
         type: String,
         enum: ["Processing", "Completed", "Failed"],
         default: "Processing"
     },
 
-    summaryPCA: {
+    representativeBatch: {
+        type: String,
+        default: null
+    },
+
+    representativePlot: {
+        type: String,
+        default: null
+    },
+
+    representativeResult: {
         type: Array,
         default: []
     },
 
-    graphPaths: {
-        type: [String],
-        default: []
-    },
-
-    zeroVarianceColumns: {
+    resultTable: {
         type: Array,
         default: []
     },
@@ -51,4 +62,7 @@ const predictionSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model("Prediction", predictionSchema);
+module.exports = mongoose.model(
+    "Prediction",
+    predictionSchema
+);

@@ -10,9 +10,11 @@ router.post("/login", userController.login);
 router.put("/change-password", verifyToken, userController.changePassword);
 
 // ADMIN ONLY
-router.post("/register", verifyToken, isAdmin, userController.register);
+router.post("/register", userController.register);
 
-router.get("/", verifyToken, isAdmin, userController.getUser);
+router.get("/active", verifyToken, isAdmin, userController.getActiveUser);
+
+router.get("/inactive", verifyToken, isAdmin, userController.getInactiveUser);
 
 router.delete("/:id", verifyToken, isAdmin, userController.deleteUser);
 

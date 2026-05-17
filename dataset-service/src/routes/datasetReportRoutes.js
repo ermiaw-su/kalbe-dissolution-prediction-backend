@@ -3,10 +3,20 @@ const router = express.Router();
 
 const {
     getDatasetReports,
-    updateDatasetReport
+    updateDatasetReport,
+    createDatasetReport
 } = require("../controllers/datasetReportController");
 
+const uploadReport = require("../middleware/reportUploadMiddleware");
+
 const { verifyToken } = require("../middleware/authMiddleware");
+
+router.post(
+    "/upload",
+    verifyToken,
+    uploadReport.single("report"),
+    createDatasetReport
+);
 
 router.get("/", verifyToken, getDatasetReports);
 

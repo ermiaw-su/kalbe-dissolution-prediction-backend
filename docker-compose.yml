@@ -16,6 +16,7 @@ services:
       - ./dataset-service/.env
     volumes:
       - ./shared-uploads:/app/shared-uploads
+      - ./shared-reports:/app/shared-reports
 
   log-service:
     build: ./log-service

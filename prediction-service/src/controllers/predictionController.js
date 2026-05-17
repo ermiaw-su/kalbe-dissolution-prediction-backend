@@ -67,7 +67,7 @@ exports.runPrediction = async (req, res) => {
         );
 
         const flaskResponse = await axios.post(
-            `${process.env.FLASK_SERVICE_URL}/process`,
+            `${process.env.FLASK_SERVICE_URL}/predict`,
             formData,
             {
                 headers: formData.getHeaders(),
@@ -78,46 +78,20 @@ exports.runPrediction = async (req, res) => {
 
         const flaskData = flaskResponse.data;
 
-        /*
-            STEP 4
-            GET BEST RESULT
-        */
+        const representativeBatch =
+            flaskData.representative_batch;
 
-        const summaryPCA =
-            flaskData.summary_pca || [];
+        const representativePlot =
+            flaskData.representative_plot;
 
-        const bestResult = summaryPCA.reduce(
-            (best, current) => {
+        const batchSummary =
+            flaskData.batch_summary || {};
 
-                return current.CV_RMSE < best.CV_RMSE
-                    ? current
-                    : best;
-            }
-        );
+        const resultTable =
+            flaskData.result_table || [];
 
-        /*
-            STEP 5
-            GENERATE GRAPH FILE NAME
-        */
-
-        const datasetName =
-            bestResult.Dataset.replace("_PCA", "");
-
-        const modelName =
-            bestResult.Model.replaceAll(" ", "");
-
-        const graphFileName =
-            `PCA_CombinedCurve_${datasetName}_${modelName}.png`;
-
-        /*
-            STEP 6
-            GENERATE GRAPH PATH
-        */
-
-        const graphPath =
-            `${flaskData.result_folder}/${graphFileName}`;
-
-        const graphPaths = [graphPath];
+        const representativeResult =
+            batchSummary[representativeBatch] || [];
 
         /*
             STEP 7
@@ -140,18 +114,20 @@ exports.runPrediction = async (req, res) => {
 
             generatedBy: req.user.id,
 
+            generatedByName: req.user.username,
+
             status: "Completed",
 
-            summaryPCA: summaryPCA,
+            representativeBatch,
 
-            graphPaths: graphPaths,
+            representativePlot,
 
-            zeroVarianceColumns:
-                flaskData.zero_variance_columns || [],
+            representativeResult,
+
+            resultTable,
 
             processingTime
         });
-
         /*
             STEP 9
             LOG ACTIVITY
