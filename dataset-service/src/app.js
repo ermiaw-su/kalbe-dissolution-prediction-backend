@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(
     "/reports",
     express.static("/app/shared-reports")
-)
+);
 
 /**
  * Swagger Documentation
