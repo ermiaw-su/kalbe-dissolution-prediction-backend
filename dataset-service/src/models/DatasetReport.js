@@ -23,6 +23,11 @@ const datasetReportSchema = new mongoose.Schema({
         default: "-"
     },
 
+    reportPath: {
+        type: String,
+        default: null
+    },
+
     reportCreatedBy: {
         type: String,
         default: null

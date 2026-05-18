@@ -26,6 +26,20 @@ exports.register = async (req, res) => {
 
         if (!role) role = "nonActive";
 
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) {
+            return res.status(400).json({ 
+                message: "User already exists" 
+            });
+        }
+
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.status(400).json({ 
+                message: "Email already exists" 
+            });
+        }
+
         // Role Limits
         if (role === "administrator") {
             const adminCount = await User.countDocuments({ role: "administrator" });

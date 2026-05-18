@@ -15,7 +15,8 @@ services:
     env_file:
       - ./dataset-service/.env
     volumes:
-      - ./dataset-service/uploads:/app/uploads
+      - ./shared-uploads:/app/shared-uploads
+      - ./shared-reports:/app/shared-reports
 
   log-service:
     build: ./log-service
@@ -23,3 +24,13 @@ services:
       - "3004:3004"
     env_file:
       - ./log-service/.env
+
+  prediction-service:
+    build: ./prediction-service
+    ports:
+      - "3003:3003"
+    env_file:
+      - ./prediction-service/.env
+    volumes:
+      - ./shared-uploads:/app/shared-uploads
+      - ../thesisPython:/app/thesisPython

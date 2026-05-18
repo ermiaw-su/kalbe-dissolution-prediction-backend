@@ -2,7 +2,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const uploadDir = path.join(__dirname, "../../uploads");
+const uploadDir = "/app/shared-uploads";
 
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir);
@@ -21,7 +21,7 @@ const storage = multer.diskStorage({
 
 // File Filter
 const fileFilter = (req, file, cb) => {
-    const allowedFileTypes = [".csv", ".xlsx", ".xls"];
+    const allowedFileTypes = [".xlsx", ".xls"];
     const allowedMimes = [
         "text/csv",
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -32,7 +32,7 @@ const fileFilter = (req, file, cb) => {
     if (allowedFileTypes.includes(ext) && allowedMimes.includes(file.mimetype)) {
         cb(null, true);
     } else {
-        cb(new Error("Invalid file type, only CSV, XLSX and XLS files are allowed"), false);
+        cb(new Error("Invalid file type, only XLSX and XLS files are allowed"), false);
     }
 };
 
