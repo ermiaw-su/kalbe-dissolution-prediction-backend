@@ -23,14 +23,13 @@ exports.register = async (req, res) => {
                 message: "Please enter a valid email" 
             });
         }
-        
 
         if (!role) role = "nonActive";
 
         const existingUsername = await User.findOne({ username });
         if (existingUsername) {
             return res.status(400).json({ 
-                message: "Username already exists" 
+                message: "User already exists" 
             });
         }
 
@@ -242,24 +241,6 @@ exports.updateUser = async (req, res) => {
         const { id } = req.params;
         const { username, email, role } = req.body;
 
-                // Role Limits
-        if (role === "administrator") {
-            const adminCount = await User.countDocuments({ role: "administrator" });
-            if (adminCount >= 5) {
-                return res.status(403).json({ 
-                    message: "Maximum number of administrators reached" 
-                });
-            }
-        }
-
-        if (role === "operator") {
-            const operatorCount = await User.countDocuments({ role: "operator" });
-            if (operatorCount >= 15) {
-                return res.status(403).json({ 
-                    message: "Maximum number of operators reached" 
-                });
-            }
-        }
         const user = await User.findByIdAndUpdate(id, {
             username,
             email,
